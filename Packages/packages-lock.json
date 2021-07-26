@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.svermeulen.extenject": {
+      "version": "9.1.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upr.wannaplay.gg"
+    },
     "com.unity.2d.animation": {
       "version": "5.0.4",
       "depth": 0,

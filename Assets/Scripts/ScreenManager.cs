@@ -1,25 +1,36 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class ScreenManager : MonoBehaviour
+public class ScreenManager
 {
-    [SerializeField] private GameObject[] screens;
+    private GameObject[] screens;
     private BaseScreen lastScreen;
-    private List<BaseScreen> cachedScreens;
-
     private BaseScreen cachedScreen;
+    private List<BaseScreen> cachedScreens;
+    private Zenject.DiContainer container;
 
-    private void Awake()
+    public ScreenManager(GameObject[] prefabs, Zenject.DiContainer container)
     {
+        screens = prefabs;
         cachedScreens = new List<BaseScreen>();
+        this.container = container;
     }
 
-    public void LoadScreen(BaseScreen screen)
+    public void LoadScreen<TBaseScreen>() where TBaseScreen : BaseScreen
     {
+        BaseScreen screen = null;
+
+        foreach (var prefab in screens)
+        {
+            TBaseScreen screenComp = prefab.GetComponent<TBaseScreen>();
+            if (screenComp)
+                screen = container.InstantiatePrefabForComponent<TBaseScreen>(prefab);
+        }
+
         if (lastScreen && lastScreen.GetId() != screen.GetId() && !lastScreen.IsPoolable())
         {
             Debug.Log($"Destory {lastScreen.gameObject}");
-            Destroy(lastScreen.gameObject);
+            Object.Destroy(lastScreen.gameObject);
             lastScreen = null;
         }
         else if (lastScreen && lastScreen.GetId() != screen.GetId())
@@ -34,7 +45,7 @@ public class ScreenManager : MonoBehaviour
 
             if (!cachedScreen)
             {
-                var cached = Instantiate(screen, GameObject.FindGameObjectWithTag("MainCanvas").transform);
+                var cached = Object.Instantiate(screen, GameObject.FindGameObjectWithTag("MainCanvas").transform);
                 cachedScreens.Add(cached);
                 lastScreen = cached;
             }
@@ -47,12 +58,10 @@ public class ScreenManager : MonoBehaviour
         {
             if (!lastScreen || lastScreen.GetId() != screen.GetId())
             {
-                lastScreen = Instantiate(screen, GameObject.FindGameObjectWithTag("MainCanvas").transform);
+                lastScreen = Object.Instantiate(screen, GameObject.FindGameObjectWithTag("MainCanvas").transform);
             }
-
         }
 
-        Debug.Log($"Enable {lastScreen.name}");
         lastScreen.gameObject.SetActive(true);
     }
 }
