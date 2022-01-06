@@ -6,7 +6,7 @@ public class BaseScreen : MonoBehaviour
     [SerializeField] private int id;
     public int GetId ()
     {
-        return id;
+        return id; 
     }
 
     public bool IsPoolable()
